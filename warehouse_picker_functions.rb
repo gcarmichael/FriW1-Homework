@@ -168,18 +168,13 @@ def items_at_bays(*bay) #(bay1, bay2, bay3)
   # items = WAREHOUSE.select{ |item| item[:bay] == bay1 || item[:bay] == bay2 || item[:bay] == bay3 }
   # items.map{|item| item[:item]}.join(", ")
   bay.map!{|item| item = item_at_bay(item)}.join(", ")
-  # bay.join(", ")
 end
 
 def bays_for_items(*item)
   item.map!{|bay| bay = bay_for_item(bay)}.join(", ")
 end
 
-# def furthest_distance(*bay)
-#   items_at_bays(bay)
-# end
-
-def distance(bay1, bay2, bay3)
+def distance3(bay1, bay2, bay3)
   location = WAREHOUSE.select{|item| item[:bay] == bay1 || item[:bay] == bay2 || item[:bay] == bay3}
     max = location.max_by{|item| item[:distance]}
     min = location.min_by{|item| item[:distance]}
@@ -189,9 +184,32 @@ def distance(bay1, bay2, bay3)
   #                         .max_by{|item| item[:distance]}
   # location_min = WAREHOUSE.select{|item| item[:bay] == bay1 || item[:bay] == bay2 || item[:bay] == bay3}
   #                         .min_by{|item| item[:distance]}
-  # puts location_max
-  # puts location_min
   # location_max[:distance] - location_min[:distance]
-
 end
 
+def distance4(bay1, bay2, bay3, bay4)
+  location = WAREHOUSE.select{|item| item[:bay] == bay1 || item[:bay] == bay2 || item[:bay] == bay3 || item[:bay] == bay4}
+  max = location.max_by{|item| item[:distance]}
+  min = location.min_by{|item| item[:distance]}
+  max[:distance] - min[:distance]
+end
+
+def order3(item1, item2, item3)
+  pick_order = WAREHOUSE.select{|bay| bay[:item] == item1 || bay[:item] == item2 || bay[:item] == item3}
+  pick_order.sort_by{|bay| bay[:distance]}
+            .map!{|bay| bay[:bay]}
+            .join(", ")
+end
+
+def order4(item1, item2, item3, item4)
+  pick_order = WAREHOUSE.select{|bay| bay[:item] == item1 || bay[:item] == item2 || bay[:item] == item3 || bay[:item] == item4}
+  pick_order.sort_by{|bay| bay[:distance]}
+            .map!{|bay| bay[:bay]}
+            .join(", ")
+end
+
+# Need to work on being more DRY with code. (e.g. methods for selecting, sorting)
+
+# Ran into issues with reusing the Multiples methods in the advanced. I suspect it's down to the .join there rather than the (*input). Couldn't get the enumeration to work afterwards with selecting multiples using the Multiples methods.
+
+# I feel like I could easily have refactored methods for the advanced stuff (e.g.) sort.map.join in the final challenge. Again, not sure how to go about keeping efficiency when expecting 3/4 inputs.
